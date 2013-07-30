@@ -7,18 +7,23 @@ import java.util.concurrent.Executors;
 import com.example.gridimage.RecyclingBitmapDrawable;
 import com.example.util.ImageCache.CacheParams;
 
+import android.R;
 import android.app.FragmentManager;
 import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
+import android.graphics.drawable.TransitionDrawable;
 import android.os.AsyncTask;
 import android.widget.ImageView;
 
 public abstract class ImageWorker {
     private static final String TAG = "ImageWorker";
 
+    private static final int TRANSITION_DURATION = 200;
     private ImageCache mImageCache;
     private ImageCache.CacheParams mCacheParams;
     private Bitmap mLoadingBitmap;
@@ -27,6 +32,11 @@ public abstract class ImageWorker {
     private boolean fadeIn = false;
     private Object mPauseWorkerLock = new Object();
     protected Resources resources;
+    
+    private static final int MESSAGR_DISK_INIT = 0;
+    private static final int MESSAEGE_DISK_CLEAR = 1;
+    private static final int MESSAGE_DISK_FLUSH = 2;
+    private static final int MESSAGE_DISK_CLOSE = 3;
 
     public ImageWorker(Context context) {
 	this.resources = context.getResources();
@@ -59,11 +69,34 @@ public abstract class ImageWorker {
     }
     
     /**
-     * download image by Internet which is implements in subclass 
+     * download image by Internet which is implements in subclass @link{ImageFecter#proccessImage(Object)}
      * @param data
      * @return
      */
     public abstract Bitmap proccessImage (Object data);
+    
+    public ImageCache getImageCache () {
+	return mImageCache;
+    }
+    
+    /**
+     * cancel task which associate with ImageView
+     * @param imageView
+     */
+    protected static void cancelWorker (ImageView imageView) {
+	final AsyncBitmapTask bitmapTask = getBitmapTask(imageView);
+	if (null!=bitmapTask) {
+	    bitmapTask.cancel(true);
+	}
+    }
+    
+    public void setBitmap (Bitmap bitmap) {
+	this.mLoadingBitmap = bitmap;
+    }
+    
+    public void setBitmap (int resId) {
+	mLoadingBitmap = BitmapFactory.decodeResource(resources, resId);
+    }
     
     public void addImageCache (FragmentManager fragmentManager, CacheParams cacheParams) {
 	mCacheParams = cacheParams;
@@ -102,6 +135,11 @@ public abstract class ImageWorker {
 	return true;
     }
 
+    /**
+     * get AsyncBitmapTask associate with current imageView
+     * @param imageView
+     * @return
+     */
     private static AsyncBitmapTask getBitmapTask(ImageView imageView) {
 	if (null != imageView) {
 	    final Drawable drawable = imageView.getDrawable();
@@ -113,9 +151,21 @@ public abstract class ImageWorker {
     }
     
     public void setDrawable (ImageView imageView, BitmapDrawable drawable) {
-	
+	if (fadeIn) {
+	TransitionDrawable transition = new TransitionDrawable(new Drawable[]{
+		new ColorDrawable(R.color.transparent),drawable});
+	imageView.setBackground(new BitmapDrawable(mLoadingBitmap));
+	imageView.setImageDrawable(transition);
+	transition.startTransition(TRANSITION_DURATION);
+	}
+	else {
+	    imageView.setImageDrawable(drawable);
+	}
     }
 
+    /**
+     * deal with get image asynchronously 
+     */
     private class AsyncBitmapTask extends AsyncTask<Object, Void, BitmapDrawable> {
 	public Object data;
 	private final WeakReference<ImageView> imageViewReference;
@@ -198,6 +248,49 @@ public abstract class ImageWorker {
 	public AsyncBitmapTask getBitmapTask() {
 	    return bitmapTaskReference.get();
 	}
+    }
+    
+    private class AsyncDiskOperate extends AsyncTask<Integer, Void, Void> {
+	
+	@Override
+	protected Void doInBackground(Integer... params) {
+	   int param = params[0];
+	   switch (param) {
+	   case MESSAGR_DISK_INIT:
+	       if (mImageCache!=null) {
+		   mImageCache.init(mCacheParams);
+	       }
+	   case MESSAEGE_DISK_CLEAR:
+	       if (null!=mImageCache) {
+		   mImageCache.clearCache();
+	       }
+	   case MESSAGE_DISK_FLUSH:
+	       if (null!=mImageCache) {
+		   mImageCache.flush();
+	       }
+	   case MESSAGE_DISK_CLOSE:
+	       if (null!=mImageCache) {
+		   mImageCache.close();
+	       }
+	   }
+	   return null;
+	}
+    }
+    
+    public void initDisk () {
+	new AsyncDiskOperate().execute(MESSAGR_DISK_INIT);
+    }
+    
+    public void clear () {
+	new AsyncDiskOperate().execute(MESSAEGE_DISK_CLEAR);
+    }
+    
+    public void flush () {
+	new AsyncDiskOperate().execute(MESSAGE_DISK_FLUSH);
+    }
+    
+    public void close () {
+	new AsyncDiskOperate().execute(MESSAGE_DISK_CLOSE);
     }
 
 }
