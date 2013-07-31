@@ -246,18 +246,21 @@ public class ImageCache {
     }
     
     public Bitmap getReusableBitmap (BitmapFactory.Options options) {
-	Bitmap item;
+	Bitmap bitmap = null;
 	if (null!=reusableBitmap&&!reusableBitmap.isEmpty()) {
+	    Bitmap item;
 	    Iterator<SoftReference<Bitmap>> iterator = reusableBitmap.iterator();
 	    while (iterator.hasNext()) {
 		item = iterator.next().get();
-		if (null!=item) {
-		    if (canReusable(item,options)) {
-			
+		if (null!=item&&item.isMutable()) {
+		    if (canReusable(item, options)) {
+			bitmap = item;
 		    }
 		}
+		break;
 	    }
 	}
+	return bitmap;
     }
     
     private boolean canReusable (Bitmap candidate, Options options) {

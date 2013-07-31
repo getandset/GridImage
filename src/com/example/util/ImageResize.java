@@ -24,6 +24,11 @@ public class ImageResize extends ImageWorker{
 	setImageSize (width,height);
     }
     
+    public ImageResize (Context context, int size) {
+	super(context);
+	setImageSize(size);
+    }
+    
     /**
      * 
      * @param width set target width
@@ -77,6 +82,10 @@ public class ImageResize extends ImageWorker{
 	BitmapFactory.decodeFile(fileName, options);
 	options.inSampleSize = caculateSampleSize(width, height, options);
 	options.inJustDecodeBounds = false;
+	//if we are running on HoneyComb or newer,try to use inBitmap
+	if (Utils.hasHoneyComb()) {
+	    addOptionInBitmap(imageCache, options);
+	}
 	return BitmapFactory.decodeFile(fileName, options);
     }
     
@@ -87,6 +96,10 @@ public class ImageResize extends ImageWorker{
 	BitmapFactory.decodeFileDescriptor(fd, null, options);
 	options.inSampleSize = caculateSampleSize(width, height, options);
 	options.inJustDecodeBounds =false;
+	//if we are running in HoneyComb or newer,try to use inBitmap
+	if (Utils.hasHoneyComb()) {
+	    addOptionInBitmap(imageCache, options);
+	}
 	return BitmapFactory.decodeFileDescriptor(fd, null, options);
     }
     
@@ -104,7 +117,10 @@ public class ImageResize extends ImageWorker{
     
     //get bitmap from hashSet to reuse
     private void addOptionInBitmap (ImageCache cache, Options options) {
-	
+	Bitmap inBitmap = cache.getReusableBitmap(options);
+	if (inBitmap!=null) {
+	    options.inBitmap = inBitmap;
+	}
     }
 
 }

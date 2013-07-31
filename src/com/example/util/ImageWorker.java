@@ -257,21 +257,17 @@ public abstract class ImageWorker {
 	   int param = params[0];
 	   switch (param) {
 	   case MESSAGR_DISK_INIT:
-	       if (mImageCache!=null) {
-		   mImageCache.init(mCacheParams);
-	       }
+	       initDiskInternal();
+	       break;
 	   case MESSAEGE_DISK_CLEAR:
-	       if (null!=mImageCache) {
-		   mImageCache.clearCache();
-	       }
+	       clearInternal();
+	       break;
 	   case MESSAGE_DISK_FLUSH:
-	       if (null!=mImageCache) {
-		   mImageCache.flush();
-	       }
+	       flushInternal();
+	       break;
 	   case MESSAGE_DISK_CLOSE:
-	       if (null!=mImageCache) {
-		   mImageCache.close();
-	       }
+	       closeInternal();
+	       break;
 	   }
 	   return null;
 	}
@@ -291,6 +287,30 @@ public abstract class ImageWorker {
     
     public void close () {
 	new AsyncDiskOperate().execute(MESSAGE_DISK_CLOSE);
+    }
+    
+    protected void initDiskInternal () {
+	if (null!=mImageCache) {
+	    mImageCache.init(mCacheParams);
+	}
+    }
+    
+    protected void clearInternal () {
+	if (null!=mImageCache) {
+	    mImageCache.clearCache();
+	}
+    }
+    
+    protected void flushInternal () {
+	if (null!=mImageCache) {
+	    mImageCache.flush();
+	}
+    }
+    
+    protected void closeInternal () {
+	if (null!=mImageCache) {
+	    mImageCache.close();
+	}
     }
 
 }
