@@ -47,6 +47,14 @@ public class ImageResize extends ImageWorker{
 	setImageSize(size, size);
     }
     
+    public int getWidth () {
+	return mWidth;
+    }
+    
+    public int getHeight () {
+	return mHeight;
+    }
+    
     /**
      * this run in background thread 
      */

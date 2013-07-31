@@ -25,7 +25,6 @@ import android.os.Environment;
 import android.os.StatFs;
 import android.support.v4.util.LruCache;
 import android.util.Log;
-import android.webkit.WebView.FindListener;
 
 import com.example.gridimage.RecyclingBitmapDrawable;
 
@@ -233,6 +232,9 @@ public class ImageCache {
 			if (null != inputStream) {
 			    FileDescriptor fileDescriptor = ((FileInputStream) inputStream)
 				    .getFD();
+			    if (fileDescriptor!=null) {
+				bitmap = 
+			    }
 
 			}
 		    }
@@ -255,9 +257,13 @@ public class ImageCache {
 		if (null!=item&&item.isMutable()) {
 		    if (canReusable(item, options)) {
 			bitmap = item;
+			reusableBitmap.remove(item);
+			break;
+		    }
+		    else {
+			reusableBitmap.remove(item);
 		    }
 		}
-		break;
 	    }
 	}
 	return bitmap;
