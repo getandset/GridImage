@@ -11,9 +11,9 @@ import java.security.MessageDigest;
 import java.util.HashSet;
 import java.util.Iterator;
 
-import android.app.Fragment;
-import android.app.FragmentManager;
-import android.app.FragmentTransaction;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Bitmap.CompressFormat;
@@ -84,6 +84,7 @@ public class ImageCache {
 	    fragment = new RetainFragment();
 	    FragmentTransaction ft = fragmentManager.beginTransaction();
 	    ft.add(fragment, TAG);
+	    ft.commit();
 	} else {
 	    fragment = (RetainFragment) fragmentManager.findFragmentByTag(TAG);
 	}
@@ -233,9 +234,9 @@ public class ImageCache {
 			    FileDescriptor fileDescriptor = ((FileInputStream) inputStream)
 				    .getFD();
 			    if (fileDescriptor!=null) {
-				bitmap = 
+				bitmap = ImageFecter.decodeSanpleBitmapFromFileDecriptor
+					(fileDescriptor, Integer.MAX_VALUE, Integer.MAX_VALUE, this);
 			    }
-
 			}
 		    }
 		} catch (IOException ex) {

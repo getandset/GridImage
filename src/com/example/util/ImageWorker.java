@@ -1,14 +1,8 @@
 package com.example.util;
 
 import java.lang.ref.WeakReference;
-import java.util.concurrent.Executor;
-import java.util.concurrent.Executors;
-
-import com.example.gridimage.RecyclingBitmapDrawable;
-import com.example.util.ImageCache.CacheParams;
 
 import android.R;
-import android.app.FragmentManager;
 import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
@@ -18,7 +12,11 @@ import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.TransitionDrawable;
 import android.os.AsyncTask;
+import android.support.v4.app.FragmentManager;
 import android.widget.ImageView;
+
+import com.example.gridimage.RecyclingBitmapDrawable;
+import com.example.util.ImageCache.CacheParams;
 
 public abstract class ImageWorker {
     private static final String TAG = "ImageWorker";
@@ -31,7 +29,7 @@ public abstract class ImageWorker {
     private boolean mPause = false;
     private boolean fadeIn = false;
     private Object mPauseWorkerLock = new Object();
-    protected Resources resources;
+    protected static Resources resources;
     
     private static final int MESSAGR_DISK_INIT = 0;
     private static final int MESSAEGE_DISK_CLEAR = 1;
@@ -39,7 +37,7 @@ public abstract class ImageWorker {
     private static final int MESSAGE_DISK_CLOSE = 3;
 
     public ImageWorker(Context context) {
-	this.resources = context.getResources();
+	resources = context.getResources();
     }
 
     public void loadImage(Object data, ImageView imageView) {
@@ -60,6 +58,7 @@ public abstract class ImageWorker {
 			imageView);
 		final AsyncDrawable asyncDrawable = new AsyncDrawable(
 			resources, mLoadingBitmap, bitmapTask);
+		    System.out.println("ImageView in"+TAG+imageView);
 		imageView.setImageDrawable(asyncDrawable);
 		bitmapTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR,
 			data);
@@ -125,12 +124,14 @@ public abstract class ImageWorker {
 
     private static boolean cancelPotentialTask(Object data, ImageView imageView) {
 	final AsyncBitmapTask bitmapTask = getBitmapTask(imageView);
-	if (bitmapTask.data != data) {
-	    bitmapTask.cancel(true);
-	}
-	// else has the same data in bitmapTask
-	else {
-	    return false;
+	if (bitmapTask!=null) {
+	    if (bitmapTask.data==null||bitmapTask.data.equals(data)) {
+		bitmapTask.cancel(true);
+	    }
+	    // else has the same data in bitmapTask
+	    else {
+		return false;
+	    }    
 	}
 	return true;
     }

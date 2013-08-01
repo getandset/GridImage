@@ -16,8 +16,8 @@ import android.graphics.BitmapFactory.Options;
 public class ImageResize extends ImageWorker{
     private static final String TAG = "ImageResize";
     
-    private int mHeight;
-    private int mWidth;
+    protected int mHeight;
+    protected int mWidth;
     
     public ImageResize (Context context, int width, int height) {
 	super(context);
@@ -68,7 +68,7 @@ public class ImageResize extends ImageWorker{
 	return decodeSampleBitmapFromeResource(resId, mWidth, mHeight, getImageCache());
     }
     
-    protected Bitmap decodeSampleBitmapFromeResource (int resId, int width, int height, ImageCache imageCache) {
+    protected static Bitmap decodeSampleBitmapFromeResource (int resId, int width, int height, ImageCache imageCache) {
 	BitmapFactory.Options options = new BitmapFactory.Options();
 	options.inJustDecodeBounds = true;
 	options.inSampleSize = 1;
@@ -83,7 +83,7 @@ public class ImageResize extends ImageWorker{
 	return BitmapFactory.decodeResource(resources, resId, options);
     }
     
-    protected Bitmap decodeSampleBitmapFromFile (String fileName, int width, int height, ImageCache imageCache) {
+    protected static Bitmap decodeSampleBitmapFromFile (String fileName, int width, int height, ImageCache imageCache) {
 	BitmapFactory.Options options = new BitmapFactory.Options();
 	options.inJustDecodeBounds = true;
 	options.inSampleSize = 1;
@@ -97,7 +97,7 @@ public class ImageResize extends ImageWorker{
 	return BitmapFactory.decodeFile(fileName, options);
     }
     
-    protected Bitmap decodeSanpleBitmapFromFileDecriptor (FileDescriptor fd, int width, int height, ImageCache imageCache) {
+    protected static Bitmap decodeSanpleBitmapFromFileDecriptor (FileDescriptor fd, int width, int height, ImageCache imageCache) {
 	BitmapFactory.Options options = new BitmapFactory.Options();
 	options.inSampleSize = 1;
 	options.inJustDecodeBounds = true;
@@ -111,7 +111,7 @@ public class ImageResize extends ImageWorker{
 	return BitmapFactory.decodeFileDescriptor(fd, null, options);
     }
     
-    private int caculateSampleSize (int reqWidth, int reqHeight, Options options) {
+    private static int caculateSampleSize (int reqWidth, int reqHeight, Options options) {
 	int sampleSize = 1;
 	final int width = options.outWidth;
 	final int height = options.outHeight;
@@ -124,7 +124,9 @@ public class ImageResize extends ImageWorker{
     }
     
     //get bitmap from hashSet to reuse
-    private void addOptionInBitmap (ImageCache cache, Options options) {
+    private static void addOptionInBitmap (ImageCache cache, Options options) {
+	
+	options.inMutable = true;
 	Bitmap inBitmap = cache.getReusableBitmap(options);
 	if (inBitmap!=null) {
 	    options.inBitmap = inBitmap;

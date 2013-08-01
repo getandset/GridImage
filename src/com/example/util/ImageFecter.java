@@ -18,7 +18,7 @@ import android.util.Log;
 import android.widget.Toast;
 
 public class ImageFecter extends ImageResize{
-    private static final String Tag = "ImageFecter";
+    private static final String TAG = "ImageFecter";
     
     private static final String DISK_CACHE_DIR = "http";
     private static final int DISK_CACHE_SIZE = 10*1024*1024;
@@ -57,7 +57,7 @@ public class ImageFecter extends ImageResize{
         	    mDiskLruCache = DiskLruCache.open(httpDiskCache, 1, 1, DISK_CACHE_SIZE);
         	}catch (IOException ex) {
         	    mDiskLruCache = null;
-        	    Log.e(Tag, "IOException in init httpDisk", ex);
+        	    Log.e(TAG, "IOException in init httpDisk", ex);
         	}
             }
             mDiskLock.notifyAll();
@@ -74,7 +74,7 @@ public class ImageFecter extends ImageResize{
 		try {
 		    mDiskLruCache.delete();
 		}catch (IOException ex) {
-		    Log.e(Tag, "Exception in httpDisk cache init", ex);
+		    Log.e(TAG, "Exception in httpDisk cache init", ex);
 		}
 		mDiskLruCache = null;
 		initDiskStarting = true;
@@ -91,7 +91,7 @@ public class ImageFecter extends ImageResize{
         	try {
         	    mDiskLruCache.flush();
         	}catch (IOException ex) {
-        	    Log.e(Tag, Tag, ex);
+        	    Log.e(TAG, TAG, ex);
         	}
             }
         }
@@ -106,7 +106,7 @@ public class ImageFecter extends ImageResize{
         	try {
         	    mDiskLruCache.close();
         	}catch (IOException ex) {
-        	    Log.e(Tag, "IOException in http disk cache close", ex);
+        	    Log.e(TAG, "IOException in http disk cache close", ex);
         	}
             }
         }
@@ -116,7 +116,7 @@ public class ImageFecter extends ImageResize{
     private boolean checkConnect (Context context) {
 	ConnectivityManager connManager = (ConnectivityManager)context.getSystemService
 		(Context.CONNECTIVITY_SERVICE);
-	NetworkInfo netInfo = connManager.getNetworkInfo(NetworkInfo.CONTENTS_FILE_DESCRIPTOR);
+	NetworkInfo netInfo = connManager.getActiveNetworkInfo();
 	if (null==netInfo||!netInfo.isConnectedOrConnecting()) {
 	    Toast.makeText(context, "network can't connect", Toast.LENGTH_LONG).show();
 	    return false;
@@ -161,7 +161,7 @@ public class ImageFecter extends ImageResize{
 		    }
 		}catch (IOException ex){
 		    
-		    Log.e(Tag, "IOException in proccessImage", ex);
+		    Log.e(TAG, "IOException in proccessImage", ex);
 		}finally {
 		    if (fileDescriptor==null&&fileInputStream!=null) {
 			try{
@@ -201,7 +201,7 @@ public class ImageFecter extends ImageResize{
 	    }
 	    return true;
 	}catch (IOException ex) {
-	    Log.e(Tag, "in loadImageFromURL", ex);
+	    Log.e(TAG, "in loadImageFromURL", ex);
 	}finally {
 	    try {
 		if (conn!=null) {
@@ -214,7 +214,7 @@ public class ImageFecter extends ImageResize{
 		    bufferedInputStream.close();
 		}
 	    }catch (Exception ex) {
-		Log.e(Tag, "in loadImageFromURL", ex);
+		Log.e(TAG, "in loadImageFromURL", ex);
 	    }
 	}
 	return false;

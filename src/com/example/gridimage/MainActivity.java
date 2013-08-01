@@ -1,24 +1,23 @@
 package com.example.gridimage;
 
 import android.os.Bundle;
-import android.app.Activity;
-import android.app.FragmentTransaction;
-import android.view.Menu;
+import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.FragmentTransaction;
 
-public class MainActivity extends Activity {
-	
-	private static final String TAG = "MainActivity";
+public class MainActivity extends FragmentActivity {
 
-	@Override
-	protected void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
-		if (getFragmentManager().findFragmentByTag(TAG)==null) {
-			GridImageFragment fragment = new GridImageFragment();
-			FragmentTransaction transaction = getFragmentManager().beginTransaction();
-			transaction.add(fragment, TAG);
-			transaction.commit();
-		}
-		
+    private static final String TAG = "MainActivity";
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+	super.onCreate(savedInstanceState);
+	if (getSupportFragmentManager().findFragmentByTag(TAG) == null) {
+	    GridImageFragment fragment = new GridImageFragment();
+	    FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+	    transaction.add(android.R.id.content, fragment, TAG);
+	    transaction.commit();
 	}
+
+    }
 
 }
