@@ -93,6 +93,9 @@ public class ImageCache {
 
     public void init(CacheParams cacheParams) {
 	this.cacheParams = cacheParams;
+	if (Utils.hasHoneyComb()) {
+	    reusableBitmap = new HashSet<SoftReference<Bitmap>>();
+	}
 	if (cacheParams.memCacheEnable) {
 	    memCache = new LruCache<String, BitmapDrawable>(
 		    cacheParams.memCache) {
@@ -104,7 +107,6 @@ public class ImageCache {
 			((RecyclingBitmapDrawable) oldValue).cache(false);
 		    } else {
 			if (Utils.hasHoneyComb()) {
-			    reusableBitmap = new HashSet<SoftReference<Bitmap>>();
 			    reusableBitmap.add(new SoftReference<Bitmap>(
 				    oldValue.getBitmap()));
 			}
@@ -123,8 +125,11 @@ public class ImageCache {
 	}
     }
 
-    private void initDisk() {
+    protected void initDisk() {
 	synchronized (mDiskCacheLock) {
+	    if (BuildDebug.DEBUG) {
+		Log.d(TAG, "initDisk starting");
+	    }
 	    if (diskCache == null || diskCache.isClosed()) {
 		File diskCacheDir = cacheParams.diskCacheDir;
 		if (cacheParams.diskCacheEnable && diskCacheDir != null) {
@@ -135,6 +140,10 @@ public class ImageCache {
 			try {
 			    diskCache = DiskLruCache.open(diskCacheDir, 1, 1,
 				    cacheParams.diskCache);
+			    if (BuildDebug.DEBUG) {
+				Log.d(TAG, "initDisk finish");
+				System.out.println("diskCache: "+diskCache);
+			    }
 
 			} catch (IOException ex) {
 			    cacheParams = null;
@@ -221,6 +230,9 @@ public class ImageCache {
 		try {
 		    // if diskInitStarting is true,thread wait
 		    mDiskCacheLock.wait();
+		    if (BuildDebug.DEBUG) {
+			Log.d(TAG, "disk initing,disk lock wait");
+		    }
 		} catch (Exception ex) {
 		}
 	    }
@@ -236,6 +248,10 @@ public class ImageCache {
 			    if (fileDescriptor!=null) {
 				bitmap = ImageFecter.decodeSanpleBitmapFromFileDecriptor
 					(fileDescriptor, Integer.MAX_VALUE, Integer.MAX_VALUE, this);
+				if (BuildDebug.DEBUG) {
+				    Log.d(TAG, "get bitmap from disk end");
+				    System.out.println(TAG+":bitmap "+bitmap);
+				}
 			    }
 			}
 		    }
@@ -261,9 +277,8 @@ public class ImageCache {
 			reusableBitmap.remove(item);
 			break;
 		    }
-		    else {
-			reusableBitmap.remove(item);
-		    }
+		}else {
+		    reusableBitmap.remove(item);
 		}
 	    }
 	}

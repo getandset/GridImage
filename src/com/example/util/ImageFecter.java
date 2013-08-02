@@ -131,12 +131,18 @@ public class ImageFecter extends ImageResize{
     }
     
     private Bitmap proccessImage (String dataString) {
+	if (BuildDebug.DEBUG) {
+	    Log.d(TAG, "proccess image from network");
+	}
 	String hashKey = ImageCache.getHashKeyForDisk(dataString);
 	FileInputStream fileInputStream = null;
 	FileDescriptor fileDescriptor = null;
 	synchronized (mDiskLock) {
 	    if (initDiskStarting) {
 		try {
+		    if (BuildDebug.DEBUG) {
+			Log.d(TAG, "disk initing,disk lock wait");
+		    }
 		    mDiskLock.wait();
 		}catch (InterruptedException ex) {}
 	    }
@@ -157,6 +163,10 @@ public class ImageFecter extends ImageResize{
 			if (snapshot!=null) {
 			    fileInputStream = (FileInputStream)snapshot.getInputStream(DISK_CACHE_INDEX);
 			    fileDescriptor = fileInputStream.getFD();
+			    if (BuildDebug.DEBUG) {
+				Log.d(TAG, "get fileDescriptor");
+				System.out.println("FD: "+fileDescriptor);
+			    }
 			}
 		    }
 		}catch (IOException ex){

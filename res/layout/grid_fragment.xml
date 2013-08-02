@@ -1,16 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-    <GridView  xmlns:android="http://schemas.android.com/apk/res/android"
-        android:id="@+id/gridImageView"
-        style="@style/photoGridLayout"
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
-        android:horizontalSpacing="@dimen/image_thumbnail_spacing"
-        android:verticalSpacing="@dimen/image_thumbnail_spacing"
-        android:stretchMode="columnWidth"
-        android:columnWidth="@dimen/image_thumbnail_size"
-        android:numColumns="auto_fit"
-        > 
-        </GridView>
+  <GridView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/gridImageView"
+    style="@style/photoGridLayout"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:columnWidth="@dimen/image_thumbnail_size"
+    android:horizontalSpacing="@dimen/image_thumbnail_spacing"
+    android:numColumns="auto_fit"
+    android:stretchMode="columnWidth"
+    android:verticalSpacing="@dimen/image_thumbnail_spacing" >
+
+</GridView>
         
 

@@ -13,6 +13,7 @@ import android.graphics.drawable.Drawable;
 import android.graphics.drawable.TransitionDrawable;
 import android.os.AsyncTask;
 import android.support.v4.app.FragmentManager;
+import android.util.Log;
 import android.widget.ImageView;
 
 import com.example.gridimage.RecyclingBitmapDrawable;
@@ -58,7 +59,6 @@ public abstract class ImageWorker {
 			imageView);
 		final AsyncDrawable asyncDrawable = new AsyncDrawable(
 			resources, mLoadingBitmap, bitmapTask);
-		    System.out.println("ImageView in"+TAG+imageView);
 		imageView.setImageDrawable(asyncDrawable);
 		bitmapTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR,
 			data);
@@ -100,6 +100,7 @@ public abstract class ImageWorker {
     public void addImageCache (FragmentManager fragmentManager, CacheParams cacheParams) {
 	mCacheParams = cacheParams;
 	mImageCache = ImageCache.getInstance(fragmentManager, cacheParams);
+	new AsyncDiskOperate().execute(MESSAGR_DISK_INIT);
     }
     
     public void setFadeIn (boolean fadeIn) {
@@ -161,6 +162,9 @@ public abstract class ImageWorker {
 	}
 	else {
 	    imageView.setImageDrawable(drawable);
+	    if (BuildDebug.DEBUG) {
+		Log.d(TAG, "image set drawable");
+	    }
 	}
     }
 
@@ -185,6 +189,9 @@ public abstract class ImageWorker {
 	    synchronized (mPauseWorkerLock) {
 		if (mPause&&!isCancelled()) {
 		    try {
+			if (BuildDebug.DEBUG) {
+			    
+			}
 			mPauseWorkerLock.wait();
 		    }catch (Exception ex) {}
 		}
@@ -192,10 +199,17 @@ public abstract class ImageWorker {
 	    //search from disk first
 	    if (null!=mImageCache&&!isCancelled()&&!forceExitEarly&&getAttachImageView()!=null) {
 	    	bitmap = mImageCache.getBitmapFromDisk(key);
+	    	if (BuildDebug.DEBUG) {
+	    	    Log.d(TAG, "get bitmap from disk");
+	    	    System.out.println("Bitmap:"+bitmap);
+	    	}
 	    }
 	    if (bitmap==null&&!isCancelled()&&!forceExitEarly&&getAttachImageView()!=null) {
 		//processImage implements in subClass link{ImageFecter#processImage}
 		bitmap  = proccessImage(params[0]);
+		if (BuildDebug.DEBUG) {
+		    Log.d(TAG, "get bitmap from network");
+		}
 	    }
 	    if (null!=bitmap) {
 		if (Utils.hasHoneyComb()) {
@@ -292,7 +306,7 @@ public abstract class ImageWorker {
     
     protected void initDiskInternal () {
 	if (null!=mImageCache) {
-	    mImageCache.init(mCacheParams);
+	    mImageCache.initDisk();
 	}
     }
     

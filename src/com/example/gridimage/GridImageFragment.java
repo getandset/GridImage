@@ -13,13 +13,13 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewGroup.LayoutParams;
 import android.view.ViewTreeObserver.OnGlobalLayoutListener;
 import android.widget.AbsListView;
 import android.widget.AbsListView.OnScrollListener;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.BaseAdapter;
-import android.widget.GridLayout.LayoutParams;
 import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.ImageView.ScaleType;
@@ -34,7 +34,7 @@ public class GridImageFragment extends Fragment implements OnItemClickListener {
 
     private static final String TAG = "GridImageFragment";
     private static final String DISK_CACHE_DIR = "thuml";
-    private static final float MEMORY_CACHE_PERCENTEGE = 0.5f;
+    private static final float MEMORY_CACHE_PERCENTEGE = 0.3f;
     private int thumlnailSize;
     private int thumlNailSpacing;
     private ImageGridAdapter mAdapter;
@@ -97,16 +97,13 @@ public class GridImageFragment extends Fragment implements OnItemClickListener {
 		    @Override
 		    public void onGlobalLayout() {
 			if (mAdapter.getCount() == 0) {
-			    final int colunmNum = (int) Math.floor(gridView
-				    .getWidth()
+			    final int colunmNum = (int) Math.floor(gridView .getWidth()
 				    / (thumlnailSize + thumlNailSpacing));
 			    if (colunmNum > 0) {
-				final int width = (gridView.getWidth() - thumlNailSpacing)
-					/ colunmNum;
+				final int width = (gridView.getWidth()/colunmNum)-thumlNailSpacing;
 				mAdapter.setColunmNums(colunmNum);
 				mAdapter.setColunmHeight(width);
 			    }
-
 			}
 		    }
 		});
@@ -165,12 +162,15 @@ public class GridImageFragment extends Fragment implements OnItemClickListener {
 	    super();
 	    this.context = context;
 	    imageViewParams = new GridView.LayoutParams(
-		    LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
+		    LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
 	    TypedValue value = new TypedValue();
 	    if (context.getTheme().resolveAttribute(
 		    android.R.attr.actionBarSize, value, true)) {
 		actionBarHeight = TypedValue.complexToDimensionPixelOffset(
 			value.data, context.getResources().getDisplayMetrics());
+		if (BuildDebug.DEBUG) {
+		    Log.d(TAG, "actioBarHeight: "+String.valueOf(actionBarHeight));
+		}
 	    }
 
 	}
@@ -213,7 +213,7 @@ public class GridImageFragment extends Fragment implements OnItemClickListener {
 	public View getView(int position, View convertView, ViewGroup parent) {
 	    if (position < colunmNums) {
 		if (convertView == null) {
-		    convertView = new ImageView(context);
+		    convertView = new View(context);
 		}
 		convertView.setLayoutParams(new AbsListView.LayoutParams(
 			android.widget.AbsListView.LayoutParams.MATCH_PARENT,
@@ -224,11 +224,14 @@ public class GridImageFragment extends Fragment implements OnItemClickListener {
 	    ImageView imageView;
 	    if (convertView == null) {
 		imageView = new RecyclingImageView(context);
+		imageView.setScaleType(ScaleType.CENTER_CROP);
 		imageView.setLayoutParams(imageViewParams);
-		imageView.setScaleType(ScaleType.CENTER);
 	    }
 	    else {
 		imageView = (RecyclingImageView) convertView;		
+	    }
+	    if (imageView.getLayoutParams().height!=height) {
+		imageView.setLayoutParams(imageViewParams);
 	    }
             imageFecter.loadImage(Images.imageThumbUrls[position-colunmNums], imageView);
 	    return imageView;
@@ -243,8 +246,15 @@ public class GridImageFragment extends Fragment implements OnItemClickListener {
 	}
 
 	public void setColunmHeight(int height) {
+	    if (this.height==height) {
+		return;
+	    }
 	    this.height = height;
+	    imageViewParams = new GridView.LayoutParams (LayoutParams.MATCH_PARENT,height);
+	    imageFecter.setImageSize(height);
+	    notifyDataSetChanged();
 	}
+	
 
 	public int getColunmHeight() {
 	    return height;
