@@ -3,6 +3,6 @@
 
     <string name="app_name">GridImage</string>
     <string name="action_settings">Settings</string>
-    <string name="hello_world">Hello world!</string>
-
+    <string name="clear_cache">清除缓存</string>
+    
 </resources>

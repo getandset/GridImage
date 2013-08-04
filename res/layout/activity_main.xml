@@ -1,16 +1,12 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/conte"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" 
+    android:id="@+id/content"
     android:orientation="vertical"
-    android:layout_width="match_parent"
+    android:layout_width="match_parent" 
     android:layout_height="wrap_content"
-    android:paddingLeft="@dimen/activity_horizontal_margin"
-    android:paddingRight="@dimen/activity_horizontal_margin"
     android:background="@android:drawable/edit_text"
-    android:addStatesFromChildren="true"
     android:divider="@android:drawable/divider_horizontal_textfield"
-    tools:context=".MainActivity" >
-    
+    android:addStatesFromChildren="true">
+
     <LinearLayout android:id="@+id/container"
         android:orientation="vertical"
         android:layout_width="match_parent" 
@@ -25,6 +21,4 @@
         android:singleLine="true"
         android:layout_gravity="center_vertical"
     />   
- 
-
 </LinearLayout>

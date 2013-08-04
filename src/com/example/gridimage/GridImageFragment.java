@@ -1,8 +1,6 @@
 package com.example.gridimage;
 
-import android.annotation.TargetApi;
 import android.content.Context;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.Log;
@@ -22,6 +20,7 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.BaseAdapter;
 import android.widget.GridView;
 import android.widget.ImageView;
+import android.widget.Toast;
 import android.widget.ImageView.ScaleType;
 
 import com.example.provider.Images;
@@ -29,7 +28,6 @@ import com.example.util.BuildDebug;
 import com.example.util.ImageCache;
 import com.example.util.ImageFecter;
 
-@TargetApi(Build.VERSION_CODES.HONEYCOMB)
 public class GridImageFragment extends Fragment implements OnItemClickListener {
 
     private static final String TAG = "GridImageFragment";
@@ -93,13 +91,18 @@ public class GridImageFragment extends Fragment implements OnItemClickListener {
 
 	gridView.getViewTreeObserver().addOnGlobalLayoutListener(
 		new OnGlobalLayoutListener() {
-
 		    @Override
 		    public void onGlobalLayout() {
-			if (mAdapter.getCount() == 0) {
+			if (BuildDebug.DEBUG) {
+			    Log.d(TAG, "onGlobalLayout invoked");
+			}
+			if (mAdapter.getColunmNums() == 0) {
 			    final int colunmNum = (int) Math.floor(gridView .getWidth()
 				    / (thumlnailSize + thumlNailSpacing));
 			    if (colunmNum > 0) {
+				if (BuildDebug.DEBUG) {
+				    Log.d(TAG, "set adapter colunms and height");
+				}
 				final int width = (gridView.getWidth()/colunmNum)-thumlNailSpacing;
 				mAdapter.setColunmNums(colunmNum);
 				mAdapter.setColunmHeight(width);
@@ -123,6 +126,7 @@ public class GridImageFragment extends Fragment implements OnItemClickListener {
         super.onPause();
         imageFecter.setFadeIn(true);
         imageFecter.setPause(true);
+        imageFecter.flush();
     }
     
     @Override
@@ -133,21 +137,25 @@ public class GridImageFragment extends Fragment implements OnItemClickListener {
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-	// TODO Auto-generated method stub
-	super.onCreateOptionsMenu(menu, inflater);
+	inflater.inflate(R.menu.main, menu);
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-	// TODO Auto-generated method stub
+	switch (item.getItemId()) {
+	case R.id.clear_cache:
+	    imageFecter.clear();
+	    Toast.makeText(getActivity(), "has clear image cache", Toast.LENGTH_LONG).show();
+	}
 	return super.onOptionsItemSelected(item);
     }
 
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position,
 	    long id) {
-	// TODO Auto-generated method stub
+	
 
+	
     }
 
     public class ImageGridAdapter extends BaseAdapter {
@@ -155,7 +163,7 @@ public class GridImageFragment extends Fragment implements OnItemClickListener {
 	private int colunmNums;
 	private int height;
 	private GridView.LayoutParams imageViewParams;
-	private Context context;
+	private final Context context;
 	private int actionBarHeight;
 
 	public ImageGridAdapter(Context context) {
@@ -196,7 +204,7 @@ public class GridImageFragment extends Fragment implements OnItemClickListener {
 
 	@Override
 	public long getItemId(int position) {
-	    return position < colunmNums ? -1 : position - colunmNums;
+	    return position < colunmNums ? 0 : position - colunmNums;
 	}
 
 	@Override
@@ -206,12 +214,15 @@ public class GridImageFragment extends Fragment implements OnItemClickListener {
 
 	@Override
 	public int getItemViewType(int position) {
-	    return position < colunmNums ? 0 : 1;
+	    return position < colunmNums ? 1 : 0;
 	}
 
 	@Override
 	public View getView(int position, View convertView, ViewGroup parent) {
 	    if (position < colunmNums) {
+		if (BuildDebug.DEBUG) {
+		    Log.d(TAG, "colunms: "+colunmNums);
+		}
 		if (convertView == null) {
 		    convertView = new View(context);
 		}
@@ -235,6 +246,11 @@ public class GridImageFragment extends Fragment implements OnItemClickListener {
 	    }
             imageFecter.loadImage(Images.imageThumbUrls[position-colunmNums], imageView);
 	    return imageView;
+	}
+	
+	@Override
+	public boolean hasStableIds() {
+	    return true;
 	}
 
 	public void setColunmNums(int colunmNum) {

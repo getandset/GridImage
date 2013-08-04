@@ -250,7 +250,6 @@ public class ImageCache {
 					(fileDescriptor, Integer.MAX_VALUE, Integer.MAX_VALUE, this);
 				if (BuildDebug.DEBUG) {
 				    Log.d(TAG, "get bitmap from disk end");
-				    System.out.println(TAG+":bitmap "+bitmap);
 				}
 			    }
 			}

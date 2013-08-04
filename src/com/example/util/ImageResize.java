@@ -105,9 +105,9 @@ public class ImageResize extends ImageWorker{
 	options.inSampleSize = caculateSampleSize(width, height, options);
 	options.inJustDecodeBounds =false;
 	//if we are running in HoneyComb or newer,try to use inBitmap
-	if (Utils.hasHoneyComb()) {
-	    addOptionInBitmap(imageCache, options);
-	}
+//	if (Utils.hasHoneyComb()) {
+//	    addOptionInBitmap(imageCache, options);
+//	}
 	return BitmapFactory.decodeFileDescriptor(fd, null, options);
     }
     
