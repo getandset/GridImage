@@ -1,6 +1,7 @@
 package com.example.gridimage;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.Log;
@@ -44,6 +45,7 @@ public class GridImageFragment extends Fragment implements OnItemClickListener {
 	if (BuildDebug.DEBUG) {
 	    Log.d(TAG, "GridFragment create");
 	}
+	
 	super.onCreate(savedInstanceState);
 	thumlnailSize = getResources().getDimensionPixelSize(
 		R.dimen.image_thumbnail_size);
@@ -153,9 +155,9 @@ public class GridImageFragment extends Fragment implements OnItemClickListener {
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position,
 	    long id) {
-	
-
-	
+	Intent intent = new Intent(getActivity(), ImageDetailActivity.class);
+	intent.putExtra(ImageDetailActivity.EXTRA_DATA, (int) id);
+        startActivity(intent);
     }
 
     public class ImageGridAdapter extends BaseAdapter {

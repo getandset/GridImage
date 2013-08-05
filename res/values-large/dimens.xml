@@ -1,4 +1,5 @@
 <resources>
      <dimen name="image_thumbnail_size">148dp</dimen>
-    <dimen name="image_thumbnail_spacing">2dp</dimen>
+     <dimen name="image_thumbnail_spacing">2dp</dimen>
+     <dimen name="pager_margin">80dp</dimen>
 </resources>

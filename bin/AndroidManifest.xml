@@ -26,6 +26,17 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        
+        <activity 
+            android:name="com.example.gridimage.ImageDetailActivity"
+            android:parentActivityName="com.example.gridimage.MainActivity"
+            android:theme="@style/AppTheme.FullScreen">
+            <meta-data 
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.example.gridimage.MainActivity">
+                
+            </meta-data>
+        </activity>
     </application>
 
 </manifest>

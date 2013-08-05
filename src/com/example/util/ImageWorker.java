@@ -82,7 +82,7 @@ public abstract class ImageWorker {
      * cancel task which associate with ImageView
      * @param imageView
      */
-    protected static void cancelWorker (ImageView imageView) {
+    public static void cancelWorker (ImageView imageView) {
 	final AsyncBitmapTask bitmapTask = getBitmapTask(imageView);
 	if (null!=bitmapTask) {
 	    bitmapTask.cancel(true);
